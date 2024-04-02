@@ -7,8 +7,5 @@ We are building a complete video hosting website similar to youtube with all the
 
 Project uses all standard practices like JWT, bcrypt, access tokens, refresh Tokens and many more.
 
----
-Top Contributer to complete all TODOs
 
-1. Spiderman (just sample)  [Link to Repo](https://www.youtube.com/@chaiaurcode)
 
