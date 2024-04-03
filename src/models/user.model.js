@@ -63,7 +63,7 @@ const userSchema = new Schema(
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
 }) // we are using function keyword because we need to define the context in this thats why we canot use arrow function because it doesent have the concept of this.
 
@@ -86,7 +86,9 @@ userSchema.method.generateAccessToken = function(){
     )
 }
 // we keep less payload(data) in referesh token because it keeps on refreshing.
-userSchema.method.generateRefreshToken = function(){
+userSchema.method.generateRefreshToken = function(
+    
+){
 
     return jwt.sign(
         {
