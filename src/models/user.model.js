@@ -20,14 +20,14 @@ const userSchema = new Schema(
             trim: true,
             index: true,
         },
-        emial: {
+        email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true,
             trim: true,
         },
-        fullname: {
+        fullName: {
             type: String,
             required: true,
             trim: true,

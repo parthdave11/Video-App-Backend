@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler( async(req, res) => {
     
@@ -18,7 +19,7 @@ const registerUser = asyncHandler( async(req, res) => {
     // return response
 
    const{fullName, email, username, password} = req.body
-   console.log("email: ",email);
+   
 
     // little advance syntax for if and some function in js
     if (
@@ -28,7 +29,7 @@ const registerUser = asyncHandler( async(req, res) => {
     }
 
     // db call
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{username}, {email}]
     })
 
@@ -43,26 +44,43 @@ const registerUser = asyncHandler( async(req, res) => {
         throw new ApiError(400, "Avatar file is required")
     }
     
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    // const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const avatar = await avatarLocalPath
+    const coverImage = await coverImageLocalPath
+    // const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required")
     }
 
+    
+    console.log("email: ",email);
+    console.log("email: ",username);
+    console.log("email: ",password);
+    console.log("email: ",fullName);
+    console.log("email: ",coverImageLocalPath);
+    console.log("email: ",avatarLocalPath);
     // db call
     const user = await User.create({
+        username,
         fullName,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || "",
+        email,
+        avatar:avatarLocalPath,
+        coverImage:coverImageLocalPath,
         password,
-        username: username.toLowerCase()
     })
-
+    
     const createdUser = await User.findById(user._id).select(
-        "-password -refe"
-    )
+        "-password -refershToken"
+        )
 
+    if(!createdUser){
+        throw new ApiError(500, 'Something went wrong while registering user')
+    }
+
+    return res.status(201).json(
+        new ApiResponse(200, createdUser, "User registered successfully")
+    )
 
 } )
 
