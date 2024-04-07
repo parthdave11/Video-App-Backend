@@ -8,7 +8,7 @@ import dotenv from "dotenv"; // but if we want to use the moduler syntax we can 
 import { app } from "./app.js";
 
 dotenv.config({
-    path: './env'
+    path: './.env'
 })
 
 connectDB()
