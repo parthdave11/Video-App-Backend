@@ -5,6 +5,7 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { json } from "express";
 import jwt from "jsonwebtoken";
+import fs from 'fs'
 
 
 const generateAccessAndRefereshTokens = async(userId) => {
@@ -36,6 +37,9 @@ const registerUser = asyncHandler( async(req, res) => {
     // remove password and referesh token field from response
     // check for user creation
     // return response
+    console.log('-----------------------')
+    console.log(req.body)
+    console.log('-----------------------')
 
    const{fullName, email, username, password} = req.body
    
@@ -65,24 +69,24 @@ const registerUser = asyncHandler( async(req, res) => {
     }
 
     console.log("email: ",email);
-    console.log("email: ",username);
-    console.log("email: ",password);
-    console.log("email: ",fullName);
-    console.log("email: ",coverImageLocalPath);
-    console.log("email: ",avatarLocalPath);
+    console.log("username: ",username);
+    console.log("password: ",password);
+    console.log("fullName: ",fullName);
+    console.log("coverImageLocalPath: ",coverImageLocalPath);
+    console.log("avatarLocalPath: ",avatarLocalPath);
     
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required")
     }
     
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    // const avatar = await uploadOnCloudinary(avatarLocalPath)
     // const avatar = await avatarLocalPath
     // const coverImage = await coverImageLocalPath
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    // const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
-    if (!avatar) {
-        throw new ApiError(400, "Avatar file is required")
-    }
+    // if (!avatar) {
+    //     throw new ApiError(400, "Avatar file is required")
+    // }
 
     
     // db call
@@ -90,11 +94,20 @@ const registerUser = asyncHandler( async(req, res) => {
         username,
         fullName,
         email,
-        avatar:avatar.url,
-        coverImage:coverImage?.url || "",
+        avatar:avatarLocalPath,
+        coverImage:coverImageLocalPath || "",
         password,
     })
-    
+
+    if(avatarLocalPath){
+        fs.unlinkSync(avatarLocalPath)
+    }
+
+    if(coverImageLocalPath && coverImageLocalPath!==avatarLocalPath){
+        fs.unlinkSync(coverImageLocalPath)
+    }
+
+
     const createdUser = await User.findById(user._id).select(
         "-password -refershToken"
         )
